@@ -40,6 +40,9 @@ let cylinder1Material = new THREE.MeshPhongMaterial({
   map: textureCylinder,
 });
 let cylinder1 = new THREE.Mesh(cylinder1Geometry, cylinder1Material);
+// SHADOWS
+cylinder1.castShadow = true;
+cylinder1.receiveShadow = true;
 cylinder1Pivot.add(cylinder1);
 cylinder1.rotation.x = Math.PI / 2;
 
@@ -60,6 +63,7 @@ let circle1Material = new THREE.MeshBasicMaterial({
   wireframe: false,
   // SLOTS - SLOTS OF THE ROULETTE
   map: textureSlots,
+  color: new THREE.Color(0.5, 0.5, 0.5),
 });
 let circle1 = new THREE.Mesh(circle1Geometry, circle1Material);
 circle1Pivot.add(circle1);
@@ -337,12 +341,13 @@ const mesh = new THREE.Mesh(
   new THREE.MeshPhongMaterial({ color: "#4E6BA6", depthWrite: false })
 );
 mesh.rotation.x = -Math.PI / 2;
+mesh.receiveShadow = true;
 scene.add(mesh);
 
-/* const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
+const grid = new THREE.GridHelper(1000, 1000, 0x000000, 0x000000);
 grid.material.opacity = 0.2;
 grid.material.transparent = true;
-scene.add(grid); */
+scene.add(grid);
 
 // USEFULL trick to inspect THREE.JS objects
 window.camera = camera;
@@ -403,18 +408,25 @@ exprFolder
 exprFolder.open();
 
 // LIGHTS
-const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+const ambient = new THREE.AmbientLight(0xffffff, 0.2);
 scene.add(ambient);
-const dir = new THREE.DirectionalLight(0xffffff, 0.3);
+const dir = new THREE.DirectionalLight(0xffffff, 0.6);
 dir.position.set(100, 200, 100);
+dir.castShadow = true;
+dir.shadow.camera.near = 0.1;
+dir.shadow.camera.far = 500;
 scene.add(dir);
+
+// SHADOWS
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // RENDER LOOP
 renderer.setAnimationLoop(render);
 
 function updateAnimation(dt) {
   const speed =
-    currentState === "Walking" ? 2 : currentState === "Running" ? 6 : 0.5;
+    currentState === "Walking" ? 2 : currentState === "Running" ? 8 : 0.5;
   phase += dt * speed;
 
   const armSwing =
@@ -423,7 +435,7 @@ function updateAnimation(dt) {
       ? 0.05
       : currentState === "Walking"
       ? 0.3
-      : 0.6);
+      : 0.2);
 
   const legSwing =
     Math.sin(phase + Math.PI) *
@@ -437,8 +449,8 @@ function updateAnimation(dt) {
     rightLeg.rotation.x = -legSwing;
   }
 
-  if (typeof armsPivot !== "undefined") {
-    armsPivot.rotation.x = armSwing;
+  if (typeof rightArm !== "undefined") {
+    rightArm.rotation.x = armSwing;
   }
 
   if (emote) {
