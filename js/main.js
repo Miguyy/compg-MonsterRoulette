@@ -10,7 +10,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   2000
 );
-camera.position.set(0, 0, 300);
+camera.position.set(0, 181, 300);
 camera.lookAt(scene.position);
 
 const renderer = new THREE.WebGLRenderer();
@@ -30,7 +30,7 @@ textureSlots.repeat.set(0.5, 0.5);
 
 // CYLINDER PIVOT - BASE OF THE ROULETTE
 const cylinder1Pivot = new THREE.Object3D();
-cylinder1Pivot.position.set(0, 20, 0);
+cylinder1Pivot.position.set(0, 181, 0);
 scene.add(cylinder1Pivot);
 
 // CYLINDER - BASE OF THE ROULETTE
@@ -42,6 +42,12 @@ let cylinder1Material = new THREE.MeshPhongMaterial({
 let cylinder1 = new THREE.Mesh(cylinder1Geometry, cylinder1Material);
 cylinder1Pivot.add(cylinder1);
 cylinder1.rotation.x = Math.PI / 2;
+
+// CAMERA AND CONTROLS UPDATE
+camera.position.set(0, 150, 420);
+controls.target.copy(cylinder1Pivot.position);
+controls.update();
+camera.lookAt(cylinder1Pivot.position);
 
 // CIRCLE 1 PIVOT - FRONT OF THE ROULETTE
 const circle1Pivot = new THREE.Object3D();
@@ -152,8 +158,8 @@ function createEye() {
 
   return new THREE.Mesh(eyeGeom, eyeMat);
 }
-
-eyePivot.add(createEye());
+const eyeMesh = createEye();
+eyePivot.add(eyeMesh);
 
 // EYEBROW
 const eyebrowPivot = new THREE.Object3D();
@@ -169,7 +175,8 @@ function createEyebrow() {
   const eyebrow = new THREE.Mesh(eyebrowGeometry, eyebrowMaterial);
   return eyebrow;
 }
-eyebrowPivot.add(createEyebrow());
+const eyebrowMesh = createEyebrow();
+eyebrowPivot.add(eyebrowMesh);
 
 // ARTICULATED OBJECTS - ARMS
 const armsPivot = new THREE.Object3D();
@@ -189,7 +196,7 @@ function createArms(offsetX, offsetY) {
   return arms;
 }
 const leftArm = createArms(-90, 70);
-const rightArm = createArms(98, -10);
+const rightArm = createArms(102, -10);
 rightArm.rotation.z = Math.PI / 12;
 armsPivot.add(leftArm, rightArm);
 
@@ -211,9 +218,9 @@ function createArmClothes(offsetX, offsetY) {
   return hands;
 }
 const leftHand = createArmClothes(-90, 86);
-const rightHand = createArmClothes(92, 40);
+const rightHand = createArmClothes(94, 32);
 rightHand.rotation.z = Math.PI / 12;
-armClothesPivot.add(leftHand, rightHand);
+/* armClothesPivot.add(leftHand, rightHand); */
 
 // ARTICULATED OBJECTS - LEGS
 const legsPivot = new THREE.Object3D();
@@ -254,7 +261,7 @@ function createLegClothes(offsetX) {
 }
 const leftLegClothes = createLegClothes(-30);
 const rightLegClothes = createLegClothes(30);
-legClothesPivot.add(leftLegClothes, rightLegClothes);
+/* legClothesPivot.add(leftLegClothes, rightLegClothes); */
 
 // ARTICULATED OBJECTS - FOOT
 const footPivot = new THREE.Object3D();
@@ -274,7 +281,25 @@ function createFoot(offsetX) {
 }
 const leftFoot = createFoot(-30);
 const rightFoot = createFoot(30);
-footPivot.add(leftFoot, rightFoot);
+/* footPivot.add(leftFoot, rightFoot); */
+leftLeg.add(leftFoot);
+leftFoot.position.set(0, -40, 10);
+rightLeg.add(rightFoot);
+rightFoot.position.set(0, -40, 10);
+
+// ADDING ARTICULATED OBJECTS TO THEIR RESPECTIVE PARTS
+leftArm.add(leftHand);
+leftHand.position.set(0, -12, 0);
+
+rightArm.add(rightHand);
+rightHand.position.set(-1, 30, 0);
+rightHand.rotation.z = Math.PI / 100;
+
+leftLeg.add(leftLegClothes);
+leftLegClothes.position.set(0, 6, 0);
+
+rightLeg.add(rightLegClothes);
+rightLegClothes.position.set(0, 6, 0);
 
 // ROULTETTE BACK - CAPE
 const shape = new THREE.Shape();
@@ -306,48 +331,166 @@ capeInterligation.position.set(0, 0, 0);
 cape2.add(capeInterligation);
 capeInterligation.rotation.z = Math.PI / 2;
 
+// GROUND PLANE
+const mesh = new THREE.Mesh(
+  new THREE.PlaneGeometry(2000, 2000),
+  new THREE.MeshPhongMaterial({ color: "#4E6BA6", depthWrite: false })
+);
+mesh.rotation.x = -Math.PI / 2;
+scene.add(mesh);
+
+/* const grid = new THREE.GridHelper(200, 40, 0x000000, 0x000000);
+grid.material.opacity = 0.2;
+grid.material.transparent = true;
+scene.add(grid); */
+
 // USEFULL trick to inspect THREE.JS objects
 window.camera = camera;
 
-/* const axesHelper = new THREE.AxesHelper(5);
-scene.add(axesHelper);
+// ANIMATION STATE
+let currentState = "Standing";
+let emote = null;
+let emoteTimer = 0;
+const emoteDuration = 0.9;
 
-const axesHelper2 = new THREE.AxesHelper(2);
-cylinder1Pivot.add(axesHelper2);
+const expr = { angry: 0, surprised: 0, sad: 0 };
 
-const axesHelper3 = new THREE.AxesHelper(2);
-cylinder1.add(axesHelper3);
+let phase = 0;
 
-const axesHelper4 = new THREE.AxesHelper(2);
-circle1Pivot.add(axesHelper4);
+// GUI
+const gui = new GUI({ width: 300 });
 
-const axesHelper5 = new THREE.AxesHelper(2);
-circle1.add(axesHelper5);
+const states = { state: "Standing" };
+gui
+  .add(states, "state", ["Standing", "Walking", "Running"])
+  .name("State")
+  .onChange((v) => {
+    currentState = v;
+  });
 
-const axesHelper6 = new THREE.AxesHelper(2);
-circle2Pivot.add(axesHelper6);
+const emoteControls = {
+  jump() {
+    if (!emote) {
+      emote = "jump";
+      emoteTimer = 0;
+    }
+  },
+  wave() {
+    if (!emote) {
+      emote = "wave";
+      emoteTimer = 0;
+    }
+  },
+};
+const emoteFolder = gui.addFolder("Emotes");
+emoteFolder.add(emoteControls, "jump").name("Jump");
+emoteFolder.add(emoteControls, "wave").name("Wave");
+emoteFolder.open();
 
-const axesHelper7 = new THREE.AxesHelper(2);
-circle2.add(axesHelper7); */
+const exprFolder = gui.addFolder("Expressions");
+exprFolder
+  .add(expr, "angry", 0, 1, 0.01)
+  .name("Angry")
+  .onChange(() => {});
+exprFolder
+  .add(expr, "surprised", 0, 1, 0.01)
+  .name("Surprised")
+  .onChange(() => {});
+exprFolder
+  .add(expr, "sad", 0, 1, 0.01)
+  .name("Sad")
+  .onChange(() => {});
+exprFolder.open();
 
-/* function animate() {
-  circle1.rotation.z += 0.01;
-  requestAnimationFrame(animate);
-}
-animate(); */
-
+// LIGHTS
 const ambient = new THREE.AmbientLight(0xffffff, 0.6);
 scene.add(ambient);
 const dir = new THREE.DirectionalLight(0xffffff, 0.3);
 dir.position.set(100, 200, 100);
 scene.add(dir);
 
+// RENDER LOOP
 renderer.setAnimationLoop(render);
 
-function render() {
+function updateAnimation(dt) {
+  const speed =
+    currentState === "Walking" ? 2 : currentState === "Running" ? 6 : 0.5;
+  phase += dt * speed;
+
+  const armSwing =
+    Math.sin(phase) *
+    (currentState === "Standing"
+      ? 0.05
+      : currentState === "Walking"
+      ? 0.3
+      : 0.6);
+
+  const legSwing =
+    Math.sin(phase + Math.PI) *
+    (currentState === "Standing"
+      ? 0.05
+      : currentState === "Walking"
+      ? 0.3
+      : 0.2);
+  if (typeof leftLeg !== "undefined") {
+    leftLeg.rotation.x = legSwing;
+    rightLeg.rotation.x = -legSwing;
+  }
+
+  if (typeof armsPivot !== "undefined") {
+    armsPivot.rotation.x = armSwing;
+  }
+
+  if (emote) {
+    emoteTimer += dt;
+    const t = emoteTimer / emoteDuration;
+    if (emote === "jump") {
+      const y = Math.sin(Math.min(t, 1) * Math.PI) * 30;
+      cylinder1Pivot.position.y = 181 + y;
+      legsPivot.rotation.x = -Math.sin(t * Math.PI) * 0.35;
+    } else if (emote === "wave") {
+      if (typeof leftArm !== "undefined") {
+        leftArm.rotation.z = Math.PI / 12 + Math.sin(t * Math.PI * 4) * 0.2;
+      }
+    }
+
+    if (emoteTimer >= emoteDuration) {
+      emote = null;
+      emoteTimer = 0;
+
+      cylinder1Pivot.position.y = 181;
+    }
+  }
+
+  if (
+    typeof eyeMesh !== "undefined" &&
+    typeof eyebrowMesh !== "undefined" &&
+    typeof eyebrowPivot !== "undefined"
+  ) {
+    const eyeScaleY =
+      1 + expr.surprised * 0.5 - expr.angry * 0.45 - expr.sad * 0.2;
+    eyeMesh.scale.set(1, Math.max(0.2, eyeScaleY), 1);
+
+    const baseEyebrowY = 18;
+    const eyebrowY =
+      baseEyebrowY + expr.surprised * 8 - expr.angry * 4 - expr.sad * 3;
+    eyebrowMesh.position.y = eyebrowY;
+
+    const eyebrowTilt = expr.angry * 0.45 - expr.sad * 0.25;
+    eyebrowPivot.rotation.set(0, 0, eyebrowTilt);
+  }
+}
+
+function render(time) {
+  if (!render._last) render._last = time;
+  const dt = (time - render._last) / 1000;
+  render._last = time;
+
+  updateAnimation(dt);
   renderer.render(scene, camera);
 }
 
+// RESPONSIVE DESIGN
 window.addEventListener("resize", (event) => {
   // update camera
   camera.aspect = window.innerWidth / window.innerHeight;
