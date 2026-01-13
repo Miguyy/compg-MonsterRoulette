@@ -30,11 +30,11 @@ textureSlots.repeat.set(0.5, 0.5);
 
 // CYLINDER PIVOT - BASE OF THE ROULETTE
 const cylinder1Pivot = new THREE.Object3D();
-cylinder1Pivot.position.set(0, 181, 0);
+cylinder1Pivot.position.set(0, 200, 0);
 scene.add(cylinder1Pivot);
 
 // CYLINDER - BASE OF THE ROULETTE
-let cylinder1Geometry = new THREE.CylinderGeometry(80, 80, 14, 60);
+let cylinder1Geometry = new THREE.CylinderGeometry(80, 80, 18, 60);
 let cylinder1Material = new THREE.MeshPhongMaterial({
   wireframe: false,
   map: textureCylinder,
@@ -54,7 +54,7 @@ camera.lookAt(cylinder1Pivot.position);
 
 // CIRCLE 1 PIVOT - FRONT OF THE ROULETTE
 const circle1Pivot = new THREE.Object3D();
-circle1Pivot.position.set(0, 0, 7.5);
+circle1Pivot.position.set(0, 0, 10);
 cylinder1Pivot.add(circle1Pivot);
 
 // CIRCLE 1 - FRONT OF THE ROULETTE
@@ -70,7 +70,7 @@ circle1Pivot.add(circle1);
 
 // CIRCLER 2 PIVOT - INNER CIRCLE
 const circle2Pivot = new THREE.Object3D();
-circle2Pivot.position.set(0, 0, 7.8);
+circle2Pivot.position.set(0, 0, 10.5);
 cylinder1Pivot.add(circle2Pivot);
 
 // CIRCLE 2 - INNER CIRCLE
@@ -84,19 +84,19 @@ circle2Pivot.add(circle2);
 
 // POINTER PIVOT
 const pointerPivot = new THREE.Object3D();
-pointerPivot.position.set(0, 10, 8);
+pointerPivot.position.set(0, 10, 10);
 cylinder1Pivot.add(pointerPivot);
 
 // POINTER OF THE ROULETTE
-let pointerGeometry = new THREE.CylinderGeometry(1, 4, 12, 10);
+let pointerGeometry = new THREE.CylinderGeometry(1, 4, 16, 10);
 let pointerMaterial = new THREE.MeshPhongMaterial({
   wireframe: false,
-  map: textureCylinder,
+  color: "#ac4646",
 });
 let pointer = new THREE.Mesh(pointerGeometry, pointerMaterial);
 pointerPivot.add(pointer);
 pointer.rotation.x = Math.PI;
-pointer.position.set(0, 62, 3.65);
+pointer.position.set(0, 60, 3.6);
 
 // POINTER ARM PIVOT
 const pointerArmPivot = new THREE.Object3D();
@@ -114,14 +114,14 @@ pointerPivot.add(pointerArm);
 pointerArm.rotation.x = Math.PI / 2;
 pointerArm.position.set(0, 68.2, 0);
 
-//POINTS STOPPER PIVOT
+// POINTER STOPPER PIVOT
 const pointerStopperPivot = new THREE.Object3D();
 pointerStopperPivot.position.set(0, 0, 2);
 circle1.add(pointerStopperPivot);
 pointerStopperPivot.rotation.z = Math.PI / 16;
 
 // POINTER STOPPER
-const pointerStopperGeometry = new THREE.CylinderGeometry(2, 2, 8, 10);
+const pointerStopperGeometry = new THREE.CylinderGeometry(2, 2, 8, 5);
 const pointerStopperMaterial = new THREE.MeshPhongMaterial({
   wireframe: false,
   map: textureCylinder,
@@ -167,7 +167,7 @@ eyePivot.add(eyeMesh);
 
 // EYEBROW
 const eyebrowPivot = new THREE.Object3D();
-eyebrowPivot.position.set(0, 18, 5);
+eyebrowPivot.position.set(0, 18, 6);
 eyePivot.add(eyebrowPivot);
 
 function createEyebrow() {
@@ -182,9 +182,33 @@ function createEyebrow() {
 const eyebrowMesh = createEyebrow();
 eyebrowPivot.add(eyebrowMesh);
 
+// ARTICULATED OBJECTS - ARMS BASE
+/* const armsBasePivot = new THREE.Object3D();
+armsBasePivot.position.set(0, -30, -11);
+circle2.add(armsBasePivot);
+
+function createArmsBase(offsetX, offsetY) {
+  const armsBaseGeometry = new THREE.CapsuleGeometry(12, 12, 4, 8, 1);
+  const armsBaseMaterial = new THREE.MeshLambertMaterial({
+    wireframe: false,
+    flatShading: true,
+    map: textureCylinder,
+  });
+
+  const armsBase = new THREE.Mesh(armsBaseGeometry, armsBaseMaterial);
+  armsBase.position.x = offsetX;
+  armsBase.position.y = offsetY;
+  return armsBase;
+}
+const leftArmBase = createArmsBase(-94, 28);
+leftArmBase.rotation.z = -Math.PI / 2;
+const rightArmBase = createArmsBase(94, 18);
+rightArmBase.rotation.z = Math.PI / 2;
+armsBasePivot.add(leftArmBase, rightArmBase); */
+
 // ARTICULATED OBJECTS - ARMS
 const armsPivot = new THREE.Object3D();
-armsPivot.position.set(0, -30, -8);
+armsPivot.position.set(0, -30, -12);
 circle2.add(armsPivot);
 
 function createArms(offsetX, offsetY) {
@@ -194,13 +218,14 @@ function createArms(offsetX, offsetY) {
     color: "#ffffff",
     flatShading: true,
   });
+
   const arms = new THREE.Mesh(armsGeometry, armsMaterial);
   arms.position.x = offsetX;
   arms.position.y = offsetY;
   return arms;
 }
-const leftArm = createArms(-90, 70);
-const rightArm = createArms(102, -10);
+const leftArm = createArms(-91, 70);
+const rightArm = createArms(100, -28);
 rightArm.rotation.z = Math.PI / 12;
 armsPivot.add(leftArm, rightArm);
 
@@ -228,7 +253,7 @@ rightHand.rotation.z = Math.PI / 12;
 
 // ARTICULATED OBJECTS - LEGS
 const legsPivot = new THREE.Object3D();
-legsPivot.position.set(0, -125, -8);
+legsPivot.position.set(0, -126, -9);
 circle2.add(legsPivot);
 
 function createLegs(offsetX) {
@@ -274,9 +299,10 @@ legsPivot.add(footPivot);
 
 function createFoot(offsetX) {
   const footGeometry = new THREE.CapsuleGeometry(15, 20, 4, 8, 1);
-  const footMaterial = new THREE.MeshPhongMaterial({
+  const footMaterial = new THREE.MeshLambertMaterial({
     color: "#48494B",
     wireframe: false,
+    flatShading: true,
   });
   const foot = new THREE.Mesh(footGeometry, footMaterial);
   foot.position.x = offsetX;
@@ -296,7 +322,7 @@ leftArm.add(leftHand);
 leftHand.position.set(0, -12, 0);
 
 rightArm.add(rightHand);
-rightHand.position.set(-1, 30, 0);
+rightHand.position.set(-1, 15, 0);
 rightHand.rotation.z = Math.PI / 100;
 
 leftLeg.add(leftLegClothes);
@@ -319,10 +345,10 @@ const capeMat2 = new THREE.MeshLambertMaterial({
   flatShading: true,
 });
 const cape2 = new THREE.Mesh(capeGeo2, capeMat2);
-cape2.position.set(0, 0, -10);
+cape2.position.set(0, 0, -12);
 cape2.rotation.x = Math.PI / 18;
 cylinder1Pivot.add(cape2);
-const capeInterligationGeo = new THREE.CylinderGeometry(3, 3, 159, 20);
+const capeInterligationGeo = new THREE.CylinderGeometry(3, 3, 159.5, 20);
 const capeInterligationMat = new THREE.MeshLambertMaterial({
   color: "#e77575",
   flatShading: true,
@@ -356,9 +382,9 @@ window.camera = camera;
 let currentState = "Standing";
 let emote = null;
 let emoteTimer = 0;
-const emoteDuration = 0.9;
+const emoteDuration = 1;
 
-const expr = { angry: 0, surprised: 0, sad: 0 };
+const expr = { suspicious: 0, surprised: 0, sad: 0 };
 
 let phase = 0;
 
@@ -394,8 +420,8 @@ emoteFolder.open();
 
 const exprFolder = gui.addFolder("Expressions");
 exprFolder
-  .add(expr, "angry", 0, 1, 0.01)
-  .name("Angry")
+  .add(expr, "suspicious", 0, 1, 0.01)
+  .name("Suspicious")
   .onChange(() => {});
 exprFolder
   .add(expr, "surprised", 0, 1, 0.01)
@@ -426,7 +452,7 @@ renderer.setAnimationLoop(render);
 
 function updateAnimation(dt) {
   const speed =
-    currentState === "Walking" ? 2 : currentState === "Running" ? 8 : 0.5;
+    currentState === "Walking" ? 2 : currentState === "Running" ? 8 : 0.9;
   phase += dt * speed;
 
   const armSwing =
@@ -442,8 +468,8 @@ function updateAnimation(dt) {
     (currentState === "Standing"
       ? 0.05
       : currentState === "Walking"
-      ? 0.3
-      : 0.2);
+      ? 0.12
+      : 0.12);
   if (typeof leftLeg !== "undefined") {
     leftLeg.rotation.x = legSwing;
     rightLeg.rotation.x = -legSwing;
@@ -458,11 +484,12 @@ function updateAnimation(dt) {
     const t = emoteTimer / emoteDuration;
     if (emote === "jump") {
       const y = Math.sin(Math.min(t, 1) * Math.PI) * 30;
-      cylinder1Pivot.position.y = 181 + y;
-      legsPivot.rotation.x = -Math.sin(t * Math.PI) * 0.35;
+      cylinder1Pivot.position.y = 200 + y;
+      legsPivot.rotation.x = -Math.sin(t * Math.PI) * 0.12;
+      rightArm.rotation.x = -Math.sin(t * Math.PI) * 0.35;
     } else if (emote === "wave") {
       if (typeof leftArm !== "undefined") {
-        leftArm.rotation.z = Math.PI / 12 + Math.sin(t * Math.PI * 4) * 0.2;
+        leftArm.rotation.z = Math.PI / 100 + Math.sin(t * Math.PI * 4) * 0.2;
       }
     }
 
@@ -470,7 +497,7 @@ function updateAnimation(dt) {
       emote = null;
       emoteTimer = 0;
 
-      cylinder1Pivot.position.y = 181;
+      cylinder1Pivot.position.y = 200;
     }
   }
 
@@ -480,17 +507,19 @@ function updateAnimation(dt) {
     typeof eyebrowPivot !== "undefined"
   ) {
     const eyeScaleY =
-      1 + expr.surprised * 0.5 - expr.angry * 0.45 - expr.sad * 0.2;
+      1 + expr.surprised * 0.5 - expr.suspicious * 0.45 - expr.sad * 0.2;
     eyeMesh.scale.set(1, Math.max(0.2, eyeScaleY), 1);
 
     const baseEyebrowY = 18;
     const eyebrowY =
-      baseEyebrowY + expr.surprised * 8 - expr.angry * 4 - expr.sad * 3;
+      baseEyebrowY + expr.surprised * 8 - expr.suspicious * 4 - expr.sad * 3;
     eyebrowMesh.position.y = eyebrowY;
 
-    const eyebrowTilt = expr.angry * 0.45 - expr.sad * 0.25;
+    const eyebrowTilt = expr.suspicious * 0.45 - expr.sad * 0.25;
     eyebrowPivot.rotation.set(0, 0, eyebrowTilt);
   }
+
+  circle1.rotation.z -= dt * 0.5;
 }
 
 function render(time) {
