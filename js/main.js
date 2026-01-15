@@ -621,7 +621,7 @@ infoDiv.innerHTML = `
   2 - Walking<br>
   3 - Running<br>
   W - Wave<br>
-  P - POV <br>
+  P - POV (PRESS AGAIN TO LEAVE)<br>
   Space - Jump <br> <br>
   <b>Mouse Controls:</b><br>
   <strong>Drag and drop the right arm (your POV) against the stoppers.</strong><br>
@@ -943,6 +943,33 @@ window.addEventListener("keydown", (event) => {
     if (!emote) {
       emote = "wave";
       emoteTimer = 0;
+    }
+  }
+});
+
+let povMode = false;
+let povOffset = new THREE.Vector3(0, 120, 0);
+let normalCameraPosition = camera.position.clone();
+let normalCameraTarget = controls.target.clone();
+
+window.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "p") {
+    povMode = !povMode;
+
+    if (povMode) {
+      const headWorldPos = cylinder1Pivot.position.clone().add(povOffset);
+      camera.position.copy(headWorldPos);
+
+      const forward = new THREE.Vector3(0, 0, 1);
+      forward.applyQuaternion(cylinder1Pivot.quaternion);
+      const lookAtPos = headWorldPos.clone().add(forward);
+
+      camera.lookAt(lookAtPos);
+      controls.enabled = false;
+    } else {
+      camera.position.copy(normalCameraPosition);
+      controls.target.copy(normalCameraTarget);
+      controls.enabled = true;
     }
   }
 });
