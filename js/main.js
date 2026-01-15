@@ -27,7 +27,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 181, 300);
 camera.lookAt(scene.position);
 
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor("#4E6BA6");
 document.body.appendChild(renderer.domElement);
@@ -530,7 +530,7 @@ controls.target.copy(cylinder1Pivot.position);
 controls.update();
 camera.lookAt(cylinder1Pivot.position);
 
-// GROUND PLANE
+/* // GROUND PLANE
 const mesh = new THREE.Mesh(
   new THREE.PlaneGeometry(2000, 2000),
   new THREE.MeshPhongMaterial({ color: "#4E6BA6", depthWrite: false })
@@ -543,7 +543,7 @@ scene.add(mesh);
 const grid = new THREE.GridHelper(1000, 1000, 0x000000, 0x000000);
 grid.material.opacity = 0.2;
 grid.material.transparent = true;
-scene.add(grid);
+scene.add(grid); */
 
 // USEFULL trick to inspect THREE.JS objects
 window.camera = camera;
