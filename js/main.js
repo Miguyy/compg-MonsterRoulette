@@ -558,17 +558,26 @@ const expr = { suspicious: 0, surprised: 0, sad: 0 };
 
 let phase = 0;
 
-// GUI
-const gui = new GUI({ width: 300 });
+// GUI CONTROLS
+const gui = new GUI({
+  width: 350,
+  title: "Character Controls",
+});
+
+gui.domElement.style.fontFamily = "Arial, sans-serif";
+gui.domElement.style.backgroundColor = "rgba(30, 30, 40, 0.8)";
+gui.domElement.style.color = "#ffffff";
+gui.domElement.style.padding = "10px";
 
 const states = { state: "Standing" };
 gui
   .add(states, "state", ["Standing", "Walking", "Running"])
-  .name("State")
+  .name("Character State")
   .onChange((v) => {
     currentState = v;
   });
 
+// Emotes
 const emoteControls = {
   jump() {
     if (!emote) {
@@ -589,19 +598,35 @@ emoteFolder.add(emoteControls, "wave").name("Wave");
 emoteFolder.open();
 
 const exprFolder = gui.addFolder("Expressions");
-exprFolder
-  .add(expr, "suspicious", 0, 1, 0.01)
-  .name("Suspicious")
-  .onChange(() => {});
-exprFolder
-  .add(expr, "surprised", 0, 1, 0.01)
-  .name("Surprised")
-  .onChange(() => {});
-exprFolder
-  .add(expr, "sad", 0, 1, 0.01)
-  .name("Sad")
-  .onChange(() => {});
+exprFolder.add(expr, "suspicious", 0, 1, 0.01).name("Suspicious");
+exprFolder.add(expr, "surprised", 0, 1, 0.01).name("Surprised");
+exprFolder.add(expr, "sad", 0, 1, 0.01).name("Sad");
 exprFolder.open();
+
+const infoDiv = document.createElement("div");
+infoDiv.style.position = "fixed";
+infoDiv.style.left = "10px";
+infoDiv.style.bottom = "10px";
+infoDiv.style.padding = "10px 15px";
+infoDiv.style.backgroundColor = "rgba(0,0,0,0.6)";
+infoDiv.style.color = "#fff";
+infoDiv.style.fontFamily = "Arial, sans-serif";
+infoDiv.style.fontSize = "14px";
+infoDiv.style.borderRadius = "8px";
+infoDiv.style.lineHeight = "1.5em";
+infoDiv.style.maxWidth = "250px";
+infoDiv.innerHTML = `
+  <b>Keyboard Controls:</b><br>
+  1 - Standing<br>
+  2 - Walking<br>
+  3 - Running<br>
+  W - Wave<br>
+  P - POV <br>
+  Space - Jump <br> <br>
+  <b>Mouse Controls:</b><br>
+  <strong>Drag and drop the right arm (your POV) against the stoppers.</strong><br>
+`;
+document.body.appendChild(infoDiv);
 
 // LIGHTS
 const ambient = new THREE.AmbientLight(0xffffff, 0.2);
