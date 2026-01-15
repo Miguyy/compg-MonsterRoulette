@@ -1,24 +1,28 @@
+// IMPORTS
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 // GLTF LOADER CASINO
-const loader = new GLTFLoader();
+const loader = new GLTFLoader(); // Create a GLTF loader instance
 
 loader.load("../assets/gameready_casino_scene.glb", function (gltf) {
-  const model = gltf.scene;
+  // Load a glTF resource
+  const model = gltf.scene; // Extract the scene from the loaded glTF
 
+  // Set model position, scale, and rotation
   model.position.set(1570, 1050, 0);
   model.scale.set(3, 3, 3);
   model.rotation.set(0, 0, 0);
 
+  // Add the model to the scene
   scene.add(model);
 });
 
-const scene = new THREE.Scene();
+const scene = new THREE.Scene(); // Create a new Three.js scene
 
-const camera = new THREE.PerspectiveCamera(
+const camera = new THREE.PerspectiveCamera( // Create a perspective camera
   50,
   window.innerWidth / window.innerHeight,
   0.1,
@@ -27,7 +31,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 181, 300);
 camera.lookAt(scene.position);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true }); // Create a WebGL renderer
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setClearColor("#4E6BA6");
 document.body.appendChild(renderer.domElement);
@@ -53,13 +57,14 @@ scene.add(cylinder1Pivot);
 // CYLINDER - BASE OF THE ROULETTE
 let cylinder1Geometry = new THREE.CylinderGeometry(150, 150, 22, 60);
 let cylinder1Material = new THREE.MeshPhongMaterial({
+  // ROULETTE SKIN
   wireframe: false,
   map: textureSkinRoulette,
   specular: 0x333333,
   shininess: 1000,
 });
 let cylinder1 = new THREE.Mesh(cylinder1Geometry, cylinder1Material);
-// SHADOWS
+// LIGHTS AND SHADOWS
 cylinder1.castShadow = true;
 cylinder1.receiveShadow = true;
 cylinder1Pivot.add(cylinder1);
@@ -68,6 +73,7 @@ cylinder1.rotation.x = Math.PI / 2;
 // ROULETTE BACK - CAPE
 const shape = new THREE.Shape();
 shape.moveTo(-120, 0);
+// Bezier curve control points
 shape.quadraticCurveTo(-90, -150, -30, -250);
 shape.quadraticCurveTo(0, -280, 30, -250);
 shape.quadraticCurveTo(90, -150, 120, 0);
@@ -87,6 +93,7 @@ cape2.rotation.x = Math.PI / 18;
 
 cylinder1Pivot.add(cape2);
 
+// ROULETTE BACK - CAPE INTERLIGATION
 const capeInterligationGeo = new THREE.CylinderGeometry(3, 3, 240, 20);
 const capeInterligationMat = new THREE.MeshLambertMaterial({
   color: "#e77575",
@@ -145,6 +152,7 @@ const pointerStopperMaterial = new THREE.MeshPhongMaterial({
 const stopperCount = 16;
 const stopperRadius = 120;
 
+// Create multiple stoppers around the pointer stopper pivot
 for (let i = 0; i < stopperCount; i++) {
   const angle = (i / stopperCount) * Math.PI * 2;
   const stopper = new THREE.Mesh(
@@ -152,8 +160,8 @@ for (let i = 0; i < stopperCount; i++) {
     pointerStopperMaterial
   );
   stopper.position.set(
-    Math.cos(angle) * stopperRadius,
-    Math.sin(angle) * stopperRadius,
+    Math.cos(angle) * stopperRadius, // X position
+    Math.sin(angle) * stopperRadius, // Y position
     0
   );
   stopper.rotation.x = Math.PI / 2;
@@ -198,8 +206,8 @@ eyePivot.position.set(0, 0, 0);
 circle2.add(eyePivot);
 
 function createEye() {
-  const eyeGeom = new THREE.SphereGeometry(22, 16, 8).toNonIndexed();
-  eyeGeom.computeVertexNormals();
+  const eyeGeom = new THREE.SphereGeometry(22, 16, 8); // Create a sphere geometry for the eye
+  eyeGeom.computeVertexNormals(); // Ensure normals are computed for proper shading
 
   const eyeMat = new THREE.MeshLambertMaterial({
     color: "#ffffff",
@@ -230,12 +238,14 @@ function createEyebrow() {
 const eyebrowMesh = createEyebrow();
 eyebrowPivot.add(eyebrowMesh);
 
-// ARTICULATED OBJECTS - ARMS BASE
+// (SOME OF THE FUNCTIONS ARE NOT COMPLETELY USED)
+// ARTICULATED OBJECTS - ARMS
 const armsBasePivot = new THREE.Object3D();
 armsBasePivot.position.set(0, -30, -12);
 circle2.add(armsBasePivot);
 
 function createArmsBase(offsetX, offsetY) {
+  // ARTICULATED OBJECTS - ARMS BASE
   const armsBaseGeo = new THREE.CylinderGeometry(14, 8, 10, 8, true);
   const armsBaseMat = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -258,6 +268,7 @@ armsBasePivot2.position.set(0, 0, 0);
 armsBasePivot.add(armsBasePivot2);
 
 function createArmsBase2(offsetX, offsetY) {
+  // ARTICULATED OBJECTS - SHOULDERS
   const armsBaseGeo2 = new THREE.SphereGeometry(10, 8, 6);
   const armsBaseMat2 = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -274,6 +285,7 @@ const rightArmBase2 = createArmsBase2(164.5, 14);
 armsBasePivot2.add(leftArmBase2, rightArmBase2);
 
 function createArmsBase3(offsetX, offsetY, offsetZ) {
+  // ARTICULATED OBJECTS - UPPER ARMS
   const armsBaseGeo3 = new THREE.BoxGeometry(50, 10, 10);
   const armsBaseMat3 = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -300,6 +312,7 @@ armsBasePivot4.position.set(0, -30, -12);
 armsBasePivot2.add(armsBasePivot4);
 
 function createArmsBase4(offsetX, offsetY, offsetZ) {
+  // ARTICULATED OBJECTS - ELBOWS
   const armsBaseGeo4 = new THREE.SphereGeometry(10, 8, 6);
   const armsBaseMat4 = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -319,6 +332,7 @@ leftArmBase3.add(leftArmBase4);
 rightArmBase3.add(rightArmBase4);
 
 function createArmsBase5(offsetX, offsetY, offsetZ) {
+  // ARTICULATED OBJECTS - FOREARMS
   const armsBaseGeo5 = new THREE.CylinderGeometry(8, 10, 50, 8);
   const armsBaseMat5 = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -340,6 +354,7 @@ rightArmBase4.add(rightArmBase5);
 
 // ARTICULATED OBJECTS - HANDS
 function createHandBase() {
+  // Hand base as a torus
   const inner = 8;
   const outer = 12;
   const radius = (inner + outer) / 2;
@@ -391,7 +406,7 @@ const rightHand = createHand();
 rightHandBase.add(rightHand);
 
 // ARTICULATED OBJECTS - FINGERS
-function createFinger1(offsetX, offsetY, offsetZ) {
+function createFingers(offsetX, offsetY, offsetZ) {
   const fingerGeo = new THREE.CylinderGeometry(3, 4, 20, 8);
   const fingerMat = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -404,20 +419,21 @@ function createFinger1(offsetX, offsetY, offsetZ) {
   return finger;
 }
 
-const leftFinger2 = createFinger1(0, 26, 0);
+const leftFinger2 = createFingers(0, 26, 0);
 leftFinger2.rotation.x = Math.PI / 12;
 leftHand.add(leftFinger2);
 
-const rightFinger2 = createFinger1(0, 26, 0);
+const rightFinger2 = createFingers(0, 26, 0);
 rightFinger2.rotation.x = Math.PI / 12;
 rightHand.add(rightFinger2);
 
-// ARTICULATED OBJECTS - LEGS BASE
+// ARTICULATED OBJECTS - LEGS
 const legsBasePivot = new THREE.Object3D();
 legsBasePivot.position.set(0, -80, -12);
 circle2.add(legsBasePivot);
 
 function createLegsBase(offsetX, offsetY) {
+  // ARTICULATED OBJECTS - LEGS BASE
   const legsBaseGeo = new THREE.CylinderGeometry(14, 8, 10, 8, true);
   const legsBaseMat = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -438,6 +454,7 @@ rightLegBase.rotation.x = -0.08;
 legsBasePivot.add(leftLegBase, rightLegBase);
 
 function createLegsBase2(offsetX, offsetY, offsetZ) {
+  // ARTICULATED OBJECTS - HIPS
   const legsBaseGeo2 = new THREE.SphereGeometry(10, 8, 6);
   const legsBaseMat2 = new THREE.MeshLambertMaterial({
     wireframe: false,
@@ -465,7 +482,7 @@ const upperBoxGeo = new THREE.BoxGeometry(12, 80, 12);
 const lowerBoxGeo = new THREE.BoxGeometry(12, 40, 12);
 const kneeGeo = new THREE.SphereGeometry(10, 8, 6);
 
-// LEFT LEG
+// REST OF THE LEFT LEG
 const leftUpperBox = new THREE.Mesh(upperBoxGeo, legMat);
 leftUpperBox.position.set(0, -25, 0);
 leftUpperBox.rotation.set(0, 0, 0);
@@ -484,7 +501,7 @@ leftLowerBox.position.set(0, -40, 0);
 leftLowerBox.rotation.set(0, 0, 0);
 leftKneePivot.add(leftLowerBox);
 
-// RIGHT LEG
+// REST OF THE RIGHT LEG
 const rightUpperBox = new THREE.Mesh(upperBoxGeo, legMat);
 rightUpperBox.position.set(0, -25, 0);
 rightUpperBox.rotation.set(0, 0, 0);
@@ -524,7 +541,7 @@ const rightFoot = createFoot();
 rightLowerBox.add(rightFoot);
 rightFoot.position.set(0, -20, 10);
 
-// CAMERA AND CONTROLS UPDATE
+// INITIAL CAMERA POSITION AND CONTROLS
 camera.position.set(0, 500, 700);
 controls.target.copy(cylinder1Pivot.position);
 controls.update();
@@ -571,39 +588,40 @@ gui.domElement.style.padding = "10px";
 
 const states = { state: "Standing" };
 gui
-  .add(states, "state", ["Standing", "Walking", "Running"])
+  .add(states, "state", ["Standing", "Walking", "Running"]) // Character States
   .name("Character State")
   .onChange((v) => {
-    currentState = v;
+    // Update current state on change
+    currentState = v; // Update current state
   });
 
 // Emotes
 const emoteControls = {
   jump() {
     if (!emote) {
-      emote = "jump";
-      emoteTimer = 0;
+      emote = "jump"; // Set emote to jump
+      emoteTimer = 0; // Reset emote timer
     }
   },
   wave() {
     if (!emote) {
-      emote = "wave";
-      emoteTimer = 0;
+      emote = "wave"; // Set emote to wave
+      emoteTimer = 0; // Reset emote timer
     }
   },
 };
-const emoteFolder = gui.addFolder("Emotes");
-emoteFolder.add(emoteControls, "jump").name("Jump");
-emoteFolder.add(emoteControls, "wave").name("Wave");
+const emoteFolder = gui.addFolder("Emotes"); // Emote Controls
+emoteFolder.add(emoteControls, "jump").name("Jump"); // Jump Emote
+emoteFolder.add(emoteControls, "wave").name("Wave"); // Wave Emote
 emoteFolder.open();
 
-const exprFolder = gui.addFolder("Expressions");
-exprFolder.add(expr, "suspicious", 0, 1, 0.01).name("Suspicious");
-exprFolder.add(expr, "surprised", 0, 1, 0.01).name("Surprised");
-exprFolder.add(expr, "sad", 0, 1, 0.01).name("Sad");
+const exprFolder = gui.addFolder("Expressions"); // Expression Controls
+exprFolder.add(expr, "suspicious", 0, 1, 0.01).name("Suspicious"); // Suspicious Expression
+exprFolder.add(expr, "surprised", 0, 1, 0.01).name("Surprised"); // Surprised Expression
+exprFolder.add(expr, "sad", 0, 1, 0.01).name("Sad"); // Sad Expression
 exprFolder.open();
 
-const infoDiv = document.createElement("div");
+const infoDiv = document.createElement("div"); // Information Div
 infoDiv.style.position = "fixed";
 infoDiv.style.left = "10px";
 infoDiv.style.bottom = "10px";
@@ -629,14 +647,14 @@ infoDiv.innerHTML = `
 document.body.appendChild(infoDiv);
 
 // LIGHTS
-const ambient = new THREE.AmbientLight(0xffffff, 0.2);
+const ambient = new THREE.AmbientLight(0xffffff, 0.2); // Ambient light for general illumination
 scene.add(ambient);
-const dir = new THREE.DirectionalLight(0xffffff, 0.2);
-dir.position.set(100, 1000, 100);
-dir.castShadow = true;
-dir.shadow.camera.near = 0.1;
-dir.shadow.camera.far = 500;
-scene.add(dir);
+const dir = new THREE.DirectionalLight(0xffffff, 0.2); // Directional light to simulate sunlight
+dir.position.set(100, 1000, 100); // Set light position
+dir.castShadow = true; // Enable shadows for the light
+dir.shadow.camera.near = 0.1; // Set shadow camera near plane
+dir.shadow.camera.far = 500; // Set shadow camera far plane
+scene.add(dir); // Add directional light to the scene
 
 // SHADOWS
 renderer.shadowMap.enabled = true;
@@ -645,209 +663,233 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 // RENDER LOOP
 renderer.setAnimationLoop(render);
 
+// STATES FUNCTION
 function animateLocomotion(dt) {
-  const isWalking = currentState === "Walking";
-  const isRunning = currentState === "Running";
+  const isWalking = currentState === "Walking"; // Check if the character is walking
+  const isRunning = currentState === "Running"; // Check if the character is running
 
   if (!isWalking && !isRunning) return;
 
-  const speed = isWalking ? 3 : 6;
-  const armAmp = isWalking ? 0.5 : 0.9;
-  const legAmp = isWalking ? 0.6 : 1.1;
+  const speed = isWalking ? 3 : 6; // Speed based on state
+  const armAmp = isWalking ? 0.5 : 0.9; // Arm amplitude based on state
+  const legAmp = isWalking ? 0.6 : 1.1; // Leg amplitude based on state
 
-  phase += dt * speed;
+  phase += dt * speed; // Update phase based on speed
 
-  const s = Math.sin(phase);
-  const s2 = Math.sin(phase + Math.PI);
+  const s = Math.sin(phase); // Sine of the phase
+  const s2 = Math.sin(phase + Math.PI); // Sine of the phase offset by PI
 
-  leftLegBase.rotation.x = s * legAmp;
-  rightLegBase.rotation.x = s2 * legAmp;
+  leftLegBase.rotation.x = s * legAmp; // Left leg rotation
+  rightLegBase.rotation.x = s2 * legAmp; // Right leg rotation
 
-  leftKneePivot.rotation.x = Math.max(0, -s) * 0.8;
-  rightKneePivot.rotation.x = Math.max(0, -s2) * 0.8;
+  leftKneePivot.rotation.x = Math.max(0, -s) * 0.8; // Left knee rotation
+  rightKneePivot.rotation.x = Math.max(0, -s2) * 0.8; // Right knee rotation
 
-  leftLowerBox.rotation.x = Math.max(0, -s) * 0.6;
-  rightLowerBox.rotation.x = Math.max(0, -s2) * 0.6;
+  leftLowerBox.rotation.x = Math.max(0, -s) * 0.6; // Left lower leg rotation
+  rightLowerBox.rotation.x = Math.max(0, -s2) * 0.6; // Right lower leg rotation
 
-  leftArmBase2.rotation.x = s2 * armAmp;
-  rightArmBase2.rotation.x = s * armAmp;
+  leftArmBase2.rotation.x = s2 * armAmp; // Left arm rotation
+  rightArmBase2.rotation.x = s * armAmp; // Right arm rotation
 
   if (isWalking) {
-    leftArmBase4.rotation.x = Math.max(0, -s2) * 0.25;
-    rightArmBase4.rotation.x = Math.max(0, -s) * 0.25;
+    // WALKING
+    leftArmBase4.rotation.x = Math.max(0, -s2) * 0.25; // Left forearm rotation
+    rightArmBase4.rotation.x = Math.max(0, -s) * 0.25; // Right forearm rotation
   }
 
   if (isRunning) {
-    leftArmBase4.rotation.x = THREE.MathUtils.clamp(-s2, 0, 1) * 0.8;
+    // RUNNING
+    leftArmBase4.rotation.x = THREE.MathUtils.clamp(-s2, 0, 1) * 0.8; // Left forearm rotation
 
-    rightArmBase4.rotation.x = THREE.MathUtils.clamp(-s, 0, 1) * 0.8;
+    rightArmBase4.rotation.x = THREE.MathUtils.clamp(-s, 0, 1) * 0.8; // Right forearm rotation
   }
 }
 
+// WAVE FUNCTION
 function animateWave(dt) {
-  const riseTime = 0.6;
-  const holdTime = 2.0;
-  const fallTime = 0.6;
+  const riseTime = 0.6; // Time taken to raise the arm
+  const holdTime = 2.0; // Time to hold the wave position
+  const fallTime = 0.6; // Time taken to lower the arm
 
-  const totalTime = riseTime + holdTime + fallTime;
-  emoteTimer += dt;
+  const totalTime = riseTime + holdTime + fallTime; // Total time for the wave emote
+  emoteTimer += dt; // Update emote timer
 
-  let raise = 0;
+  let raise = 0; // Variable to track arm raise amount
 
   if (emoteTimer < riseTime) {
-    const t = emoteTimer / riseTime;
-    raise = t * t * (3 - 2 * t);
+    // Raising phase
+    const t = emoteTimer / riseTime; // Normalized time for rising
+    raise = t * t * (3 - 2 * t); // Smoothstep function for easing
   } else if (emoteTimer < riseTime + holdTime) {
-    raise = 1;
+    // Holding phase
+    raise = 1; // Arm is fully raised
   } else if (emoteTimer < totalTime) {
-    const t = (emoteTimer - riseTime - holdTime) / fallTime;
-    raise = 1 - t * t * (3 - 2 * t);
+    // Falling phase
+    const t = (emoteTimer - riseTime - holdTime) / fallTime; // Normalized time for falling
+    raise = 1 - t * t * (3 - 2 * t); // Smoothstep function for easing
   } else {
-    emote = null;
-    emoteTimer = 0;
+    emote = null; // End of emote
+    emoteTimer = 0; // Reset emote timer
 
-    rightArmBase2.rotation.set(0, 0, 0);
-    rightArmBase4.rotation.set(0, 0, 0);
+    rightArmBase2.rotation.set(0, 0, 0); // Reset arm rotations
+    rightArmBase4.rotation.set(0, 0, 0); // Reset forearm rotations
     return;
   }
 
-  rightArmBase2.rotation.x = (-Math.PI / 1.7) * raise;
+  rightArmBase2.rotation.x = (-Math.PI / 1.7) * raise; // Raise the upper arm
 
-  rightArmBase4.rotation.x = (-Math.PI / 18) * raise;
+  rightArmBase4.rotation.x = (-Math.PI / 18) * raise; // Slight bend in the forearm
 
-  const wave = Math.sin(emoteTimer * 7) * 0.5 * raise;
-  rightArmBase4.rotation.z = wave;
+  const wave = Math.sin(emoteTimer * 7) * 0.5 * raise; // Waving motion
+  rightArmBase4.rotation.z = wave; // Apply waving motion to forearm
 }
 
+// JUMP FUNCTION
 function animateJump(dt) {
-  const jumpHeight = 80;
-  const jumpTime = 1.0;
-  emoteTimer += dt;
+  const jumpHeight = 80; // Height of the jump
+  const jumpTime = 1.0; // Total time for the jump emote
+  emoteTimer += dt; // Update emote timer
 
-  const t = Math.min(emoteTimer / jumpTime, 1);
+  const t = Math.min(emoteTimer / jumpTime, 1); // Normalized time for the jump
 
-  const y = jumpHeight * 4 * t * (1 - t);
+  const y = jumpHeight * 4 * t * (1 - t); // Parabolic jump calculation
 
-  cylinder1Pivot.position.y = 500 + y;
+  cylinder1Pivot.position.y = 500 + y; // Update character's vertical position
 
-  const legBend = y / jumpHeight;
-  leftLegBase2.rotation.x = -legBend * 0.8;
-  rightLegBase2.rotation.x = -legBend * 0.8;
+  const legBend = y / jumpHeight; // Calculate leg bend based on jump height
+  leftLegBase2.rotation.x = -legBend * 0.8; // Bend left leg
+  rightLegBase2.rotation.x = -legBend * 0.8; // Bend right leg
 
   if (t >= 1) {
-    emote = null;
-    emoteTimer = 0;
-    cylinder1Pivot.position.y = 500;
-    leftLegBase2.rotation.x = 0;
-    rightLegBase2.rotation.x = 0;
+    // End of jump
+    emote = null; // Reset emote
+    emoteTimer = 0; // Reset emote timer
+    cylinder1Pivot.position.y = 500; // Reset vertical position
+    leftLegBase2.rotation.x = 0; // Reset left leg rotation
+    rightLegBase2.rotation.x = 0; // Reset right leg rotation
   }
 }
 
 // BREATHING
-let breathPhase = 0;
-const breathSpeed = 1;
-const breathAmp = 0.02;
+let breathPhase = 0; // Phase for breathing animation
+const breathSpeed = 1.25; // Speed of breathing
+const breathAmp = 0.02; // Amplitude of breathing
 
+// BREATHING FUNCTION
 function animateBreathing(dt) {
-  if (currentState !== "Standing") return;
+  // Breathing animation
+  if (currentState !== "Standing") return; // Only breathe when standing
 
-  breathPhase += dt * breathSpeed;
+  breathPhase += dt * breathSpeed; // Update breath phase
 
-  const breath = Math.sin(breathPhase) * breathAmp;
+  const breath = Math.sin(breathPhase) * breathAmp; // Calculate breath offset
 
-  leftArmBase2.rotation.x = breath;
+  leftArmBase2.rotation.x = breath; // Breathe arms
 
+  // Breathe forearms
   leftArmBase4.rotation.x = breath * 0.9;
   rightArmBase4.rotation.x = -breath * 0.9;
 
+  // Breathe legs
   leftLegBase.rotation.x = -breath * 0.9;
   rightLegBase.rotation.x = breath * 0.9;
 
+  // Breathe lower legs
   leftLowerBox.rotation.x = -breath * 0.9;
   rightLowerBox.rotation.x = breath * 0.9;
 
+  // Cape moves while breathing
   cape2.rotation.x = Math.PI / 18 + breath * 0.9;
 
+  // Body moves while breathing
   cylinder1Pivot.position.y = 500 + breath * 10;
 }
 
+// UPDATE ANIMATION FUNCTION
 function updateAnimation(dt) {
-  animateLocomotion(dt);
+  // Update character animation
+  animateLocomotion(dt); // Locomotion animation
 
-  if (emote === "wave") animateWave(dt);
-  if (emote === "jump") animateJump(dt);
-  animateBreathing(dt);
+  if (emote === "wave") animateWave(dt); // Wave emote
+  if (emote === "jump") animateJump(dt); // Jump emote
+  animateBreathing(dt); // Breathing animation
 }
 
+// EXPRESSIONS FUNCTION
 function animateExpressions() {
+  // Animate facial expressions
   if (
-    typeof eyeMesh !== "undefined" &&
-    typeof eyebrowMesh !== "undefined" &&
-    typeof eyebrowPivot !== "undefined"
+    typeof eyeMesh !== "undefined" && // Ensure eyeMesh is defined
+    typeof eyebrowMesh !== "undefined" && // Ensure eyebrowMesh is defined
+    typeof eyebrowPivot !== "undefined" // Ensure eyebrowPivot is defined
   ) {
     const eyeScaleY =
-      1 + expr.surprised * 0.3 - expr.suspicious * 0.45 - expr.sad * 0.2;
-    eyeMesh.scale.set(1, Math.max(0.2, eyeScaleY), 1);
+      1 + expr.surprised * 0.3 - expr.suspicious * 0.45 - expr.sad * 0.2; // Calculate eye scale based on expressions
+    eyeMesh.scale.set(1, Math.max(0.2, eyeScaleY), 1); // Apply eye scale with minimum limit
 
-    const baseEyebrowY = 18;
+    const baseEyebrowY = 18; // Base Y position for the eyebrow
     const eyebrowY =
-      baseEyebrowY + expr.surprised * 8 - expr.suspicious * 4 - expr.sad * 3;
-    eyebrowMesh.position.y = eyebrowY;
+      baseEyebrowY + expr.surprised * 8 - expr.suspicious * 4 - expr.sad * 3; // Calculate eyebrow Y position based on expressions
+    eyebrowMesh.position.y = eyebrowY; // Apply eyebrow Y position
 
-    const eyebrowTilt = expr.suspicious * 0.45 - expr.sad * 0.25;
-    eyebrowPivot.rotation.set(0, 0, eyebrowTilt);
+    const eyebrowTilt = expr.suspicious * 0.45 - expr.sad * 0.25; // Calculate eyebrow tilt based on expressions
+    eyebrowPivot.rotation.set(0, 0, eyebrowTilt); // Apply eyebrow tilt
   }
 }
 
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-let draggingArm = false;
-let dragPlane = new THREE.Plane();
-let intersectPoint = new THREE.Vector3();
+// MOUSE INTERACTION FOR DRAGGING THE RIGHT ARM
+const raycaster = new THREE.Raycaster(); // Raycaster for mouse interaction
+const mouse = new THREE.Vector2(); // Normalized mouse coordinates
+let draggingArm = false; // Flag to track if the arm is being dragged
+let dragPlane = new THREE.Plane(); // Plane for dragging calculations
+let intersectPoint = new THREE.Vector3(); // Point of intersection with the drag plane
 
 function onMouseDown(event) {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  // Mouse down event handler
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1; // Normalize mouse X coordinate
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // Normalize mouse Y coordinate
 
-  raycaster.setFromCamera(mouse, camera);
+  raycaster.setFromCamera(mouse, camera); // Set raycaster from camera and mouse position
 
-  const intersects = raycaster.intersectObject(rightArmBase3, true);
+  const intersects = raycaster.intersectObject(rightArmBase3, true); // Check for intersection with right arm
   if (intersects.length > 0) {
-    draggingArm = true;
+    // If intersection occurs
+    draggingArm = true; // Set dragging flag to true
 
-    const elbowWorldPos = rightArmBase2.getWorldPosition(new THREE.Vector3());
+    const elbowWorldPos = rightArmBase2.getWorldPosition(new THREE.Vector3()); // Get elbow world position
     dragPlane.setFromNormalAndCoplanarPoint(
-      camera.getWorldDirection(new THREE.Vector3()).clone().negate(),
-      elbowWorldPos
+      // Set drag plane
+      camera.getWorldDirection(new THREE.Vector3()).clone().negate(), // Plane normal facing camera
+      elbowWorldPos // Coplanar point at elbow position
     );
   }
 }
 
-let targetElbowAngle = 0;
-const elbowLerpSpeed = 5;
+let targetElbowAngle = 0; // Target angle for the elbow
+const elbowLerpSpeed = 5; // Speed for elbow angle interpolation
 
 function onMouseMove(event) {
-  if (!draggingArm) return;
+  if (!draggingArm) return; // If not dragging, exit
 
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1; // Normalize mouse X coordinate
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // Normalize mouse Y coordinate
 
-  raycaster.setFromCamera(mouse, camera);
+  raycaster.setFromCamera(mouse, camera); // Set raycaster from camera and mouse position
 
-  raycaster.ray.intersectPlane(dragPlane, intersectPoint);
-  if (!intersectPoint) return;
+  raycaster.ray.intersectPlane(dragPlane, intersectPoint); // Find intersection with drag plane
+  if (!intersectPoint) return; // If no intersection, exit
 
-  const elbowWorldPos = rightArmBase2.getWorldPosition(new THREE.Vector3());
+  const elbowWorldPos = rightArmBase2.getWorldPosition(new THREE.Vector3()); // Get elbow world position
 
-  const localPoint = rightArmBase2.parent.worldToLocal(intersectPoint.clone());
+  const localPoint = rightArmBase2.parent.worldToLocal(intersectPoint.clone()); // Convert intersection point to local space
 
-  const dir = localPoint.clone().sub(rightArmBase2.position);
+  const dir = localPoint.clone().sub(rightArmBase2.position); // Direction vector from elbow to intersection point
 
-  targetElbowAngle = Math.atan2(dir.y, dir.x);
+  targetElbowAngle = Math.atan2(dir.y, dir.x); // Calculate target elbow angle
 }
 
 function onMouseUp(event) {
-  draggingArm = false;
+  draggingArm = false; // Reset dragging flag on mouse up
 }
 
 window.addEventListener("mousedown", onMouseDown, false);
@@ -855,11 +897,13 @@ window.addEventListener("mousemove", onMouseMove, false);
 window.addEventListener("mouseup", onMouseUp, false);
 
 function updateElbow(dt) {
+  // Update elbow rotation towards target angle
   rightArmBase2.rotation.z +=
     (targetElbowAngle - rightArmBase2.rotation.z) *
-    Math.min(dt * elbowLerpSpeed, 1);
+    Math.min(dt * elbowLerpSpeed, 1); // Interpolate elbow rotation
 }
 
+// WHEEL SPINNING VARIABLES AND FUNCTION
 let wheelSpeed = 0.0;
 const wheelFriction = 0.995;
 let stopping = false;
@@ -871,64 +915,69 @@ const POINTER_REST_X = Math.PI;
 const POINTER_REST_Z = 0;
 
 function spinTheWheel(dt) {
-  const pointerBox = new THREE.Box3().setFromObject(pointer);
-  const fingerBox = new THREE.Box3().setFromObject(rightFinger2);
+  // Spin the wheel and handle pointer interaction
+  const pointerBox = new THREE.Box3().setFromObject(pointer); // Bounding box for pointer
+  const fingerBox = new THREE.Box3().setFromObject(rightFinger2); // Bounding box for finger
 
   let pointerHit = false;
   let fingerHit = false;
 
   pointerStopperPivot.children.forEach((stopper) => {
-    const stopperBox = new THREE.Box3().setFromObject(stopper);
+    // Check for collisions with stoppers
+    const stopperBox = new THREE.Box3().setFromObject(stopper); // Bounding box for stopper
     if (pointerBox.intersectsBox(stopperBox)) {
-      pointerHit = true;
+      pointerHit = true; // Pointer hit detected
     }
     if (fingerBox.intersectsBox(stopperBox)) {
-      fingerHit = true;
+      fingerHit = true; // Finger hit detected
     }
   });
 
   if (fingerHit && wheelSpeed === 0) {
-    stopping = true;
-    wheelSpeed = Math.random() * 10 + 20;
+    // Start spinning the wheel if finger hits stopper
+    stopping = true; // Begin stopping process
+    wheelSpeed = Math.random() * 10 + 20; // Random initial wheel speed
   }
 
   if (stopping) {
-    wheelSpeed *= wheelFriction;
+    wheelSpeed *= wheelFriction; // Apply friction to slow down the wheel
     if (wheelSpeed < 0.01) {
-      wheelSpeed = 0;
-      stopping = false;
+      // Stop the wheel if speed is low enough
+      wheelSpeed = 0; // Set wheel speed to zero
+      stopping = false; // Reset stopping flag
     }
   }
 
-  circle1.rotation.z -= wheelSpeed * dt;
+  circle1.rotation.z -= wheelSpeed * dt; // Rotate the wheel
 
-  if (pointerHit) pointerVelocity = -3;
+  if (pointerHit) pointerVelocity = -3; // Apply force to pointer if it hits a stopper
 
-  const force = (0 - pointerAngle) * pointerStiffness;
-  pointerVelocity += force * dt;
-  pointerVelocity *= Math.exp(-pointerDamping * dt);
-  pointerAngle += pointerVelocity * dt;
+  const force = (0 - pointerAngle) * pointerStiffness; // Calculate restoring force for pointer
+  pointerVelocity += force * dt; // Update pointer velocity with restoring force
+  pointerVelocity *= Math.exp(-pointerDamping * dt); // Apply damping (amortecimento) to pointer velocity
+  pointerAngle += pointerVelocity * dt; // Update pointer angle based on velocity
 
-  pointer.rotation.x = POINTER_REST_X;
-  pointer.rotation.z = POINTER_REST_Z + pointerAngle;
+  pointer.rotation.x = POINTER_REST_X; // Set pointer X rotation
+  pointer.rotation.z = POINTER_REST_Z + pointerAngle; // Update pointer Z rotation with angle
 
-  pointerAngle = THREE.MathUtils.clamp(pointerAngle, -0.5, 0);
+  pointerAngle = THREE.MathUtils.clamp(pointerAngle, -0.5, 0); // Clamp pointer angle within limits
 }
 
+// RENDER FUNCTION
 function render(time) {
-  if (!render._last) render._last = time;
-  const dt = (time - render._last) / 1000;
-  render._last = time;
+  if (!render._last) render._last = time; // Initialize last time
+  const dt = (time - render._last) / 1000; // Calculate delta time
+  render._last = time; // Update last time
 
-  updateAnimation(dt);
-  spinTheWheel(dt);
-  animateExpressions();
+  updateAnimation(dt); // Update character animation
+  spinTheWheel(dt); // Update wheel spinning
+  animateExpressions(); // Update facial expressions
+  updateElbow(dt); // Update elbow rotation
 
-  updateElbow(dt);
-
-  renderer.render(scene, camera);
+  renderer.render(scene, camera); // Render the scene
 }
 
+// KEYBOARD CONTROLS
 window.addEventListener("keydown", (event) => {
   if (event.key === " ") {
     if (!emote) {
@@ -947,6 +996,7 @@ window.addEventListener("keydown", (event) => {
   }
 });
 
+// POV MODE TOGGLE
 let povMode = false;
 let povOffset = new THREE.Vector3(0, 120, 0);
 let normalCameraPosition = camera.position.clone();
