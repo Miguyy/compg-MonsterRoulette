@@ -1,6 +1,20 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+// GLTF LOADER CASINO
+const loader = new GLTFLoader();
+
+loader.load("../assets/gameready_casino_scene.glb", function (gltf) {
+  const model = gltf.scene;
+
+  model.position.set(1570, 1050, 0);
+  model.scale.set(3, 3, 3);
+  model.rotation.set(0, 0, 0);
+
+  scene.add(model);
+});
 
 const scene = new THREE.Scene();
 
@@ -30,7 +44,10 @@ textureSlots.repeat.set(0.5, 0.5);
 
 // CYLINDER PIVOT - BASE OF THE ROULETTE
 const cylinder1Pivot = new THREE.Object3D();
-cylinder1Pivot.position.set(0, 500, 0);
+cylinder1Pivot.position.set(0, 506, 0);
+cylinder1Pivot.rotation.z = Math.PI / 2;
+cylinder1Pivot.rotation.x = Math.PI / 2;
+cylinder1Pivot.rotation.y = -Math.PI / 2;
 scene.add(cylinder1Pivot);
 
 // CYLINDER - BASE OF THE ROULETTE
@@ -47,6 +64,41 @@ cylinder1.castShadow = true;
 cylinder1.receiveShadow = true;
 cylinder1Pivot.add(cylinder1);
 cylinder1.rotation.x = Math.PI / 2;
+
+// ROULETTE BACK - CAPE
+const shape = new THREE.Shape();
+shape.moveTo(-120, 0);
+shape.quadraticCurveTo(-90, -150, -30, -250);
+shape.quadraticCurveTo(0, -280, 30, -250);
+shape.quadraticCurveTo(90, -150, 120, 0);
+
+const extrudeSettings = { depth: 6, bevelEnabled: false };
+const capeGeo2 = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+capeGeo2.translate(0, 0, -3);
+
+const capeMat2 = new THREE.MeshLambertMaterial({
+  color: "#e77575",
+  flatShading: true,
+});
+
+const cape2 = new THREE.Mesh(capeGeo2, capeMat2);
+cape2.position.set(0, 0, -10);
+cape2.rotation.x = Math.PI / 18;
+
+cylinder1Pivot.add(cape2);
+
+const capeInterligationGeo = new THREE.CylinderGeometry(3, 3, 240, 20);
+const capeInterligationMat = new THREE.MeshLambertMaterial({
+  color: "#e77575",
+  flatShading: true,
+});
+const capeInterligation = new THREE.Mesh(
+  capeInterligationGeo,
+  capeInterligationMat
+);
+capeInterligation.position.set(0, 0, 0);
+cape2.add(capeInterligation);
+capeInterligation.rotation.z = Math.PI / 2;
 
 // CIRCLE 1 PIVOT - FRONT OF THE ROULETTE
 const circle1Pivot = new THREE.Object3D();
@@ -554,7 +606,7 @@ exprFolder.open();
 // LIGHTS
 const ambient = new THREE.AmbientLight(0xffffff, 0.2);
 scene.add(ambient);
-const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+const dir = new THREE.DirectionalLight(0xffffff, 0.2);
 dir.position.set(100, 1000, 100);
 dir.castShadow = true;
 dir.shadow.camera.near = 0.1;
