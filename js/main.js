@@ -718,11 +718,40 @@ function animateJump(dt) {
   }
 }
 
+// BREATHING
+let breathPhase = 0;
+const breathSpeed = 1;
+const breathAmp = 0.02;
+
+function animateBreathing(dt) {
+  if (currentState !== "Standing") return;
+
+  breathPhase += dt * breathSpeed;
+
+  const breath = Math.sin(breathPhase) * breathAmp;
+
+  leftArmBase2.rotation.x = breath;
+
+  leftArmBase4.rotation.x = breath * 0.9;
+  rightArmBase4.rotation.x = -breath * 0.9;
+
+  leftLegBase.rotation.x = -breath * 0.9;
+  rightLegBase.rotation.x = breath * 0.9;
+
+  leftLowerBox.rotation.x = -breath * 0.9;
+  rightLowerBox.rotation.x = breath * 0.9;
+
+  cape2.rotation.x = Math.PI / 18 + breath * 0.9;
+
+  cylinder1Pivot.position.y = 500 + breath * 10;
+}
+
 function updateAnimation(dt) {
   animateLocomotion(dt);
 
   if (emote === "wave") animateWave(dt);
   if (emote === "jump") animateJump(dt);
+  animateBreathing(dt);
 }
 
 function animateExpressions() {
@@ -874,6 +903,34 @@ function render(time) {
 
   renderer.render(scene, camera);
 }
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === " ") {
+    if (!emote) {
+      emote = "jump";
+      emoteTimer = 0;
+    }
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "w") {
+    if (!emote) {
+      emote = "wave";
+      emoteTimer = 0;
+    }
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "1") {
+    currentState = "Standing";
+  } else if (event.key === "2") {
+    currentState = "Walking";
+  } else if (event.key === "3") {
+    currentState = "Running";
+  }
+});
 
 // RESPONSIVE DESIGN
 window.addEventListener("resize", (event) => {
