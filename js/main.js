@@ -143,7 +143,7 @@ const pointerStopperMaterial = new THREE.MeshPhongMaterial({
   map: textureSkinRoulette,
 });
 const stopperCount = 16;
-const stopperRadius = 128;
+const stopperRadius = 120;
 
 for (let i = 0; i < stopperCount; i++) {
   const angle = (i / stopperCount) * Math.PI * 2;
