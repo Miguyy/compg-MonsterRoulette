@@ -32,6 +32,7 @@ Controls
   - `W` — Wave
   - `P` — Toggle POV (press again to exit)
   - `Space` — Jump
+  - `Backspace` — Resets the character's position
 - Mouse:
   - Click & drag the right arm to interact with the stoppers and influence the wheel.
 
