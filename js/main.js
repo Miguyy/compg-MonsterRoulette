@@ -88,7 +88,7 @@ const capeMat2 = new THREE.MeshLambertMaterial({
 });
 
 const cape2 = new THREE.Mesh(capeGeo2, capeMat2);
-cape2.position.set(0, 0, -10);
+cape2.position.set(0, 50, -13);
 cape2.rotation.x = Math.PI / 18;
 
 cylinder1Pivot.add(cape2);
@@ -190,7 +190,7 @@ pointer.rotation.x = Math.PI;
 pointer.position.set(0, 55, 4);
 
 // POINTER ARM
-let pointerArmGeometry = new THREE.BoxGeometry(18, 20, 3);
+let pointerArmGeometry = new THREE.BoxGeometry(40, 20, 3);
 let pointerArmMaterial = new THREE.MeshPhongMaterial({
   wireframe: false,
   map: textureSkinRoulette,
@@ -565,6 +565,17 @@ scene.add(grid); */
 // USEFULL trick to inspect THREE.JS objects
 window.camera = camera;
 
+// CHARACTER TRANSLATION VARIABLES
+const startPosition = new THREE.Vector3(0, 500, 0); // Starting position of the character
+const targetPosition = new THREE.Vector3(600, 500, 0); // Target position to move to
+let maxMoveDistance = 350; // Maximum distance the character can move
+let movedDistance = 0; // Distance moved so far
+let movementLocked = false; // Flag to lock movement
+
+let isMovingToTarget = false; // Flag to indicate if the character is moving to the target
+const walkSpeed = 120; // units per second
+const runSpeed = 260; // units per second
+
 // ANIMATION STATE
 let currentState = "Standing";
 let emote = null;
@@ -587,13 +598,7 @@ gui.domElement.style.color = "#ffffff";
 gui.domElement.style.padding = "10px";
 
 const states = { state: "Standing" };
-gui
-  .add(states, "state", ["Standing", "Walking", "Running"]) // Character States
-  .name("Character State")
-  .onChange((v) => {
-    // Update current state on change
-    currentState = v; // Update current state
-  });
+gui;
 
 // Emotes
 const emoteControls = {
@@ -643,6 +648,8 @@ infoDiv.innerHTML = `
   Space - Jump <br> <br>
   <b>Mouse Controls:</b><br>
   <strong>Drag and drop the right arm (your POV) against the stoppers.</strong><br>
+  <br><br>
+  <b>Backspace - Resets ONLY the character's position</b>
 `;
 document.body.appendChild(infoDiv);
 
@@ -672,7 +679,7 @@ function animateLocomotion(dt) {
 
   const speed = isWalking ? 3 : 6; // Speed based on state
   const armAmp = isWalking ? 0.5 : 0.9; // Arm amplitude based on state
-  const legAmp = isWalking ? 0.6 : 1.1; // Leg amplitude based on state
+  const legAmp = isWalking ? 0.6 : 0.9; // Leg amplitude based on state
 
   phase += dt * speed; // Update phase based on speed
 
@@ -703,6 +710,38 @@ function animateLocomotion(dt) {
 
     rightArmBase4.rotation.x = THREE.MathUtils.clamp(-s, 0, 1) * 0.8; // Right forearm rotation
   }
+}
+
+// MOVE CHARACTER FUNCTION
+function moveCharacter(dt) {
+  if (currentState !== "Walking" && currentState !== "Running") return; // Only move if walking or running
+  if (!isMovingToTarget) return; // Only move if flagged to move
+
+  const speed = currentState === "Walking" ? walkSpeed : runSpeed; // Speed based on state
+
+  const direction = new THREE.Vector3().subVectors(
+    targetPosition,
+    cylinder1Pivot.position
+  );
+
+  const distanceToTarget = direction.length();
+
+  if (movedDistance >= maxMoveDistance || distanceToTarget < 0.5) {
+    isMovingToTarget = false;
+    currentState = "Standing";
+    movedDistance = 0;
+    return;
+  }
+
+  direction.normalize().multiplyScalar(-1); // Normalize and invert direction
+
+  const step = speed * dt; // Calculate step size
+  cylinder1Pivot.position.addScaledVector(direction, step); // Move character
+  movedDistance += step; // Update moved distance
+
+  // Rotate character to face movement direction
+  const angle = Math.atan2(direction.x, direction.z);
+  cylinder1Pivot.rotation.y = angle;
 }
 
 // WAVE FUNCTION
@@ -813,6 +852,7 @@ function updateAnimation(dt) {
   if (emote === "wave") animateWave(dt); // Wave emote
   if (emote === "jump") animateJump(dt); // Jump emote
   animateBreathing(dt); // Breathing animation
+  moveCharacter(dt); // Character movement
 }
 
 // EXPRESSIONS FUNCTION
@@ -856,6 +896,8 @@ function onMouseDown(event) {
     // If intersection occurs
     draggingArm = true; // Set dragging flag to true
 
+    controls.enabled = false;
+
     const elbowWorldPos = rightArmBase2.getWorldPosition(new THREE.Vector3()); // Get elbow world position
     dragPlane.setFromNormalAndCoplanarPoint(
       // Set drag plane
@@ -890,6 +932,7 @@ function onMouseMove(event) {
 
 function onMouseUp(event) {
   draggingArm = false; // Reset dragging flag on mouse up
+  controls.enabled = true; // Re-enable controls
 }
 
 window.addEventListener("mousedown", onMouseDown, false);
@@ -961,6 +1004,13 @@ function spinTheWheel(dt) {
   pointer.rotation.z = POINTER_REST_Z + pointerAngle; // Update pointer Z rotation with angle
 
   pointerAngle = THREE.MathUtils.clamp(pointerAngle, -0.5, 0); // Clamp pointer angle within limits
+
+  // Turn off orbit controls when spinning
+  if (wheelSpeed > 0) {
+    controls.enabled = false; // Disable controls while wheel is spinning
+  } else {
+    controls.enabled = true; // Enable controls when wheel is stopped
+  }
 }
 
 // RENDER FUNCTION
@@ -973,6 +1023,19 @@ function render(time) {
   spinTheWheel(dt); // Update wheel spinning
   animateExpressions(); // Update facial expressions
   updateElbow(dt); // Update elbow rotation
+
+  if (povMode) {
+    const headWorldPos = cylinder1Pivot.position.clone().add(povOffset);
+    camera.position.lerp(headWorldPos, 0.2); // Smoothly follow the head position
+
+    const forward = new THREE.Vector3(0, 0, 1);
+    forward.applyQuaternion(cylinder1Pivot.quaternion); // Rotate forward vector by character's orientation
+    const lookAtPos = headWorldPos.clone().add(forward);
+
+    controls.enabled = false; // Disable controls in POV mode
+
+    camera.lookAt(lookAtPos);
+  }
 
   renderer.render(scene, camera); // Render the scene
 }
@@ -1011,8 +1074,8 @@ window.addEventListener("keydown", (event) => {
       camera.position.copy(headWorldPos);
 
       const forward = new THREE.Vector3(0, 0, 1);
-      forward.applyQuaternion(cylinder1Pivot.quaternion);
-      const lookAtPos = headWorldPos.clone().add(forward);
+      forward.applyQuaternion(cylinder1Pivot.quaternion); // Rotate forward vector by character's orientation
+      const lookAtPos = headWorldPos.clone().add(forward); // Point in front of the character
 
       camera.lookAt(lookAtPos);
       controls.enabled = false;
@@ -1027,10 +1090,56 @@ window.addEventListener("keydown", (event) => {
 window.addEventListener("keydown", (event) => {
   if (event.key === "1") {
     currentState = "Standing";
-  } else if (event.key === "2") {
+    isMovingToTarget = false;
+    return;
+  }
+
+  // Lock movement after first walking or running command
+  if (movementLocked) return;
+
+  if (event.key === "2") {
     currentState = "Walking";
-  } else if (event.key === "3") {
+    isMovingToTarget = true;
+    movementLocked = true; // Blocked if walked once
+  }
+
+  if (event.key === "3") {
     currentState = "Running";
+    isMovingToTarget = true;
+    movementLocked = true; // Blocked if ran once
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Backspace") {
+    // Reset character position
+    cylinder1Pivot.position.copy(startPosition);
+
+    // Reset rotation
+    cylinder1Pivot.position.set(0, 506, 0);
+    cylinder1Pivot.rotation.z = Math.PI / 2;
+    cylinder1Pivot.rotation.x = Math.PI / 2;
+    cylinder1Pivot.rotation.y = -Math.PI / 2;
+
+    // Reset movement flags
+    currentState = "Standing";
+    isMovingToTarget = false;
+    movementLocked = false;
+    movedDistance = 0;
+
+    // Reset wheel
+    wheelSpeed = 0;
+    stopping = false;
+    pointerAngle = 0;
+    pointerVelocity = 0;
+    pointer.rotation.z = POINTER_REST_Z;
+
+    // Reset emotes
+    emote = null;
+    emoteTimer = 0;
+
+    // Re-enable controls
+    controls.enabled = true;
   }
 });
 
